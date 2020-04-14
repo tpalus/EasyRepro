@@ -25,7 +25,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample
         public static BrowserOptions Options = new BrowserOptions
         {
             BrowserType = BrowserType.Chrome,
-            PrivateMode = true,
+            PrivateMode = false,
             FireEvents = false,
             Headless = false,
             UserAgent = false

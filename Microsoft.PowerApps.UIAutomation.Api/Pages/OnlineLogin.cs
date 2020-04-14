@@ -263,5 +263,30 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             return redirect ? LoginResult.Redirect : LoginResult.Success;
         }
 
+        public BrowserCommandResult<LoginResult> PowerAppsLogin(Uri uri, SecureString username, Action<LoginRedirectEventArgs> redirectAction)
+        {
+            return this.Execute(GetOptions("PowerApps Login"), this.PowerAppsLogin, uri, username, default(Action<LoginRedirectEventArgs>));
+        }
+        private LoginResult PowerAppsLogin(IWebDriver driver, Uri uri, SecureString username, Action<LoginRedirectEventArgs> redirectAction)
+        {
+            
+            driver.Navigate().GoToUrl(uri);
+
+            if(driver.IsVisible(By.Id("use_another_account_link")))
+                    driver.ClickWhenAvailable(By.Id("use_another_account_link"));
+
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]),
+                $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
+
+            driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
+            driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
+            driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
+            Thread.Sleep(2000);
+
+            driver.WaitUntilVisible(By.XPath("//div[contains(@class,'PublishedAppContainer')]"));
+
+            return LoginResult.Success;
+
+        }
     }
 }
