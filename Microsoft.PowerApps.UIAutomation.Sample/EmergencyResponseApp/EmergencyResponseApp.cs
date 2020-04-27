@@ -10,9 +10,6 @@ using Microsoft.PowerApps.UIAutomation.Api.Controls;
 using System.Linq;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using System.Security;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Tooling.Connector;
-using Microsoft.Xrm.Sdk.Query;
 
 namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
 {
@@ -665,11 +662,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
             appBrowser.Player.SetValue(textArea);
         }
 
-        private CrmServiceClient ConnectToAdminApp()
-        {
-            string connectionString = "AuthType = D365;Username = ggeiszle@microsoft.com;Url = https://org322c1f7a.crm.dynamics.com";
-            return new CrmServiceClient(connectionString);
-        }
 
 
     }
