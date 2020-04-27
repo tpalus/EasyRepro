@@ -7,6 +7,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -65,6 +66,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     throw;
             }
         }
+        public static IWebElement ClickIfVisible(this ISearchContext driver, By by, TimeSpan? timeout = null)
+                    => WaitUntilClickable(driver, by, timeout ?? TimeSpan.FromSeconds(1), e => e.Click());
 
         public static IWebElement ClickWhenAvailable(this IWebDriver driver, By by)
         {
@@ -116,6 +119,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
+        public static void Click(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
+            => driver.Perform(a => a.Click(), element, offsetFunc, ignoreStaleElementException);
+
+
         #endregion Click
 
         #region Double Click
@@ -148,6 +155,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
+        public static void Perform(this IWebDriver driver, Func<Actions, Actions> action, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
+        {
+            try
+            {
+                var actions = new Actions(driver);
+                if (offsetFunc == null)
+                    actions = actions.MoveToElement(element);
+                else
+                {
+                    var offset = offsetFunc();
+                    actions = actions.MoveToElement(element, offset.X, offset.Y);
+                }
+                action(actions).Perform();
+            }
+            catch (StaleElementReferenceException)
+            {
+                if (!ignoreStaleElementException)
+                    throw;
+            }
+        }
         #endregion
 
         #region Script Execution
@@ -626,6 +653,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return returnElement;
         }
 
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, string exceptionMessage)
+          => WaitUntilAvailable(driver, by, null, null, exceptionMessage);
+
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage)
+            => WaitUntilAvailable(driver, by, null, successCallback, exceptionMessage);
+
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage)
+            => WaitUntilAvailable(driver, by, timeout, null, exceptionMessage);
+
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by,
+            TimeSpan? timeout,
+            Action<IWebElement> successCallback,
+            string exceptionMessage)
+        {
+            if (string.IsNullOrWhiteSpace(exceptionMessage))
+                exceptionMessage = $"Unable to find any element by: {by}";
+            return WaitUntilAvailable(driver, by, timeout, successCallback, () => throw new InvalidOperationException(exceptionMessage));
+        }
+
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by,
+            TimeSpan? timeout = null,
+            Action<IWebElement> successCallback = null,
+            Action failureCallback = null)
+        {
+            return WaitUntil(driver, d => d.FindAvailable(by), timeout,
+                successCallback,
+                failureCallback
+            );
+        }
+
+        public static IWebElement FindAvailable(this ISearchContext driver, By locator)
+        {
+            ReadOnlyCollection<IWebElement> elements = driver.FindElements(locator);
+            int? count = elements?.Count;
+            if (count == null || count == 0)
+                return null;
+
+            var result = count > 1
+                ? elements.FirstOrDefault(x => x?.Displayed == true)
+                : elements.First(x => x != null);
+
+            return result;
+        }
         public static bool WaitUntilVisible(this IWebDriver driver, By by)
         {
             return WaitUntilVisible(driver, by, Constants.DefaultTimeout, null, null);
@@ -685,6 +755,83 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return WaitUntilClickable(driver, by, timeout, successCallback, null);
         }
+
+
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, string exceptionMessage)
+           => WaitUntilClickable(driver, by, null, null, exceptionMessage);
+
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage)
+            => WaitUntilClickable(driver, by, null, successCallback, exceptionMessage);
+
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage)
+            => WaitUntilClickable(driver, by, timeout, null, exceptionMessage);
+
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, TimeSpan? timeout, Action<IWebElement> successCallback, string exceptionMessage)
+        {
+            if (string.IsNullOrWhiteSpace(exceptionMessage))
+                exceptionMessage = $"Unable to find any clickable element by: {by}";
+            return WaitUntilClickable(driver, by, timeout, successCallback, () => throw new InvalidOperationException(exceptionMessage));
+        }
+
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by,
+            TimeSpan? timeout = null,
+            Action<IWebElement> successCallback = null,
+            Action failureCallback = null)
+        {
+            return WaitUntil(driver, d => d.FindClickable(by), timeout,
+                successCallback,
+                failureCallback
+            );
+        }
+        public static IWebElement WaitUntil(this ISearchContext driver, Func<ISearchContext, IWebElement> searchFunc,
+           TimeSpan? timeout = null,
+           Action<IWebElement> successCallback = null, Action failureCallback = null)
+        {
+            var wait = new DefaultWait<ISearchContext>(driver)
+            {
+                Timeout = timeout ?? Constants.DefaultTimeout
+            };
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
+
+            bool success = false;
+            IWebElement element = null;
+            try
+            {
+                element = wait.Until(searchFunc);
+                success = element != null;
+            }
+            catch (WebDriverTimeoutException)
+            {
+            }
+
+            if (success)
+                successCallback?.Invoke(element);
+            else
+                failureCallback?.Invoke();
+
+            return element;
+        }
+
+        public static bool IsClickable(this IWebElement element) => element.IsVisible() && element.IsEnable();
+        public static bool IsEnable(this IWebElement element) => element?.Enabled == true;
+        public static bool IsVisible(this IWebElement element) => element?.Displayed == true;
+
+
+        public static IWebElement FindClickable(this ISearchContext driver, By locator)
+        {
+            ReadOnlyCollection<IWebElement> elements = driver.FindElements(locator);
+            IWebElement result = elements.FirstOrDefault(IsClickable);
+            return result;
+        }
+
+        public static bool TryFindElement(this ISearchContext context, By by, out IWebElement element)
+        {
+            var elements = context.FindElements(by);
+            var success = elements.Count > 0;
+            element = success ? elements[0] : null;
+            return success;
+        }
+
 
         public static bool WaitUntilClickable(this IWebDriver driver, By by, TimeSpan timeout, Action<IWebDriver> successCallback, Action<IWebDriver> failureCallback)
         {
