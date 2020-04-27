@@ -51,7 +51,8 @@
     <Compile Include="AppPage.cs" />
     <Compile Include="Controls\CanvasControl.cs" />
     <Compile Include="Controls\ComboBox.cs" />
-    <Compile Include="Controls\TextField.cs" />
+    <Compile Include="Controls\TextArea.cs" />
+    <Compile Include="Controls\TextBox.cs" />
     <Compile Include="Controls\DropDownList.cs" />
     <Compile Include="Controls\PlayerControl.cs" />
     <Compile Include="DTOs\ElementReference.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Pages\Backstage.cs" />
     <Compile Include="Pages\BackstageAppSettings.cs" />
     <Compile Include="Pages\BackstageSidebar.cs" />
+    <Compile Include="Pages\AdminApp.cs" />
     <Compile Include="Pages\TestFramework.cs" />
     <Compile Include="Pages\Player.cs" />
     <Compile Include="Pages\Canvas.cs" />
@@ -74,13 +76,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj">
       <Project>{c9748803-f3cb-4531-b313-bc24d4d0bf0c}</Project>
       <Name>Microsoft.Dynamics365.UIAutomation.Browser</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

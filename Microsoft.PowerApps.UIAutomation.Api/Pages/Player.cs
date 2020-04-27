@@ -83,12 +83,10 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             return this.Execute($"Click {buttonName} Button", driver =>
             {
-                //var container = this.Browser.Driver.FindElement(By.XPath($"//div[contains(text(),'{buttonName}')]"));
-                //var container = this.Browser.Driver.FindElement(By.XPath($"//div[contains(@data-control-name,'{buttonName}_Button')]"));
-
-                //container.FindElement(By.TagName("button")).Click(true);
-
-                this.Browser.Driver.FindElement(By.XPath($"//div[contains(text(),'{buttonName}')]")).Click(true);
+                if (this.Browser.Driver.HasElement(By.XPath($"//div[contains(text(),'{buttonName}')]")))
+                    this.Browser.Driver.FindElement(By.XPath($"//div[contains(text(),'{buttonName}')]")).Click(true);
+                else
+                    throw new NotFoundException($"Unable to find {buttonName} button");
 
                 //Use WaitForPageToLoad if possible
                 driver.WaitForPageToLoad();
@@ -103,8 +101,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             return this.Execute($"Click {itemName} Gallery Item", driver =>
             {
-                if (driver.HasElement(By.XPath("//div[contains(text(),'Supplies')]")))
-                    driver.FindElements(By.XPath("//div[contains(text(),'Supplies')]"))[0].Click();
+                if (driver.HasElement(By.XPath($"//div[contains(text(),'{ itemName }')]")))
+                    driver.FindElements(By.XPath($"//div[contains(text(),'{ itemName }')]"))[0].Click();
                 else
                     throw new NotFoundException($"Unable to locate {itemName} item in the gallery");
 
@@ -112,7 +110,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
                 if(focusOnNewWindow)
                 {
-                    driver.SwitchTo().Window(driver.WindowHandles[1]);
+                    driver.SwitchTo().Window(driver.WindowHandles.Last());
                     driver.SwitchTo().DefaultContent();
                     driver.SwitchTo().Frame(0);
                 }
@@ -147,14 +145,14 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             return this.Execute($"Click Feedback", driver =>
             {
-                driver.SwitchTo().Window(driver.WindowHandles[1]);
+                //driver.SwitchTo().Window(driver.WindowHandles.Last());
                 driver.SwitchTo().DefaultContent();
                 driver.SwitchTo().Frame(0);
 
                 if (driver.HasElement(By.XPath($"//div[contains(@data-control-name,'Feedback_Icon')]")))
                     driver.FindElement(By.XPath($"//div[contains(@data-control-name,'Feedback_Icon')]")).Click(true);
 
-                Browser.ThinkTime(500);
+                Browser.ThinkTime(1000);
 
                 return true;
 

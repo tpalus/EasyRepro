@@ -283,7 +283,10 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
             Thread.Sleep(2000);
 
-            driver.WaitUntilVisible(By.XPath("//div[contains(@class,'PublishedAppContainer')]"));
+            driver.WaitUntilVisible(By.XPath("//div[contains(@class,'publishedAppContainer')]"));
+            driver.SwitchTo().DefaultContent();
+            driver.SwitchTo().Frame(0);
+            driver.WaitUntilVisible(By.XPath("//div[contains(@data-control-name,'Splash_Next_Button')]"));
 
             return LoginResult.Success;
 

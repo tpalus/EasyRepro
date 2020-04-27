@@ -62,6 +62,10 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         public Apps Apps => this.GetPage<Apps>();
         #endregion
 
+        #region AdminApp
+        public AdminApp AdminApp => this.GetPage<AdminApp>();
+        #endregion
+
         #region Canvas
         public Canvas Canvas => this.GetPage<Canvas>();
         #endregion

@@ -15,7 +15,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api.Controls
             if (browser.Driver.HasElement(By.XPath($"//div[contains(@data-control-name,'{this.ControlName}')]")))
             {
                 //Click the down arrow
-                var appControl = browser.Driver.FindElements(By.XPath($"//div[contains(@data-control-name,'{this.ControlName}')]"))[0];
+                var appControl = browser.Driver.FindElement(By.XPath($"//div[@data-control-name='{this.ControlName}']"));
 
                 var downArrow = appControl.FindElements(By.XPath(".//div[contains(@class, 'arrowContainer')]"));
 
