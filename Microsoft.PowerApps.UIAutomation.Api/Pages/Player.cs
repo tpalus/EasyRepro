@@ -73,6 +73,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             return this.Execute($"Set Value for {control.ControlName} control", driver =>
             {
+                IWebElement controlElement = this.Browser.Driver.FindElement(By.XPath($"//*[contains(@data-control-name,'{control.ControlName}')]"));
+                control.ScrollIntoView(this.Browser, controlElement);
                 control.SetValue(this.Browser);
 
                 return true;

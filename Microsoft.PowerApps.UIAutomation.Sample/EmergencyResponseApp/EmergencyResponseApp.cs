@@ -416,7 +416,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
         }
 
         [TestMethod]
-        public void NOTIMPLEMENTED_ImportSolution_SampleData()
+        public void NOTIMPLEMENTED_UseEquipmentApp()
         {
             var username = ConfigurationManager.AppSettings["OnlineUsername"];
             var password = ConfigurationManager.AppSettings["OnlinePassword"];

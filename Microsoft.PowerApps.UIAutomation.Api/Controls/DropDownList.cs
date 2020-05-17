@@ -34,6 +34,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api.Controls
                 {
                     if (listItem.Text.Equals(this.ControlValue, StringComparison.OrdinalIgnoreCase))
                     {
+                        ScrollIntoView(browser, listItem);
                         listItem.Click(true);
                         found = true;
                         break;

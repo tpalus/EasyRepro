@@ -17,5 +17,10 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
 
         }
+
+        public void ScrollIntoView(InteractiveBrowser browser, IWebElement element)
+        {
+            browser.Driver.ExecuteScript("arguments[0].scrollIntoView(true);", element);
+        }
     }
 }
