@@ -452,7 +452,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
         }
 
         [TestMethod]
-        public void NOTIMPLMENTED_UseEquipmentApp()
+        public void UseEquipmentApp()
         {
             var username = ConfigurationManager.AppSettings["OnlineUsername"];
             var password = ConfigurationManager.AppSettings["OnlinePassword"];
@@ -466,7 +466,42 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
                 //Launch the App
                 appBrowser.OnlineLogin.PowerAppsLogin(appsPage, username.ToSecureString(), null);
 
+                //Pick the DDL Lists
+                COVIDLocation location = SetNewLocation(appBrowser);
 
+                //Click Next Button
+                appBrowser.Player.ClickButton("Next");
+
+                //Select Staffing Needs App
+                appBrowser.Player.ClickGalleryItem(EmergencyResponseAppNames.Equipment, true);
+
+                //Fill out the form and click Send
+                SetEquipmentValues(appBrowser);
+
+                appBrowser.Player.ClickButton("Submit");
+                appBrowser.ThinkTime(2000);
+
+                //Check the Inserted Values
+
+                //Click the Home button
+                appBrowser.Player.ClickButton("Home");
+
+                //Select a different system/location/facility
+                appBrowser.Player.ReturnToFacilityMenu(location.System);
+
+                //Choose New Location
+                COVIDLocation location2 = SetNewLocation(appBrowser);
+
+                //Click Next Button
+                appBrowser.Player.ClickButton("Next");
+
+                //Reopen the App
+                appBrowser.Player.ClickGalleryItem(EmergencyResponseAppNames.Equipment, true);
+
+                //Click the feedback Icon
+                ProvideFeedback(appBrowser);
+
+                appBrowser.Player.ClickButton("Submit");
 
                 appBrowser.ThinkTime(1000);
             }
@@ -717,6 +752,23 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
             SetStaffingNeedsValue_TextBox(browser, "# of Surge Beds", "DataCardValue16_1", i++.ToString());
             SetStaffingNeedsValue_TextBox(browser, "# of Pediatric ICU Beds", "DataCardValue13", i++.ToString());
             SetStaffingNeedsValue_TextBox(browser, "# of Pediatric Acute Beds", "DataCardValue7", i++.ToString());
+        }
+
+        private void SetEquipmentValues(PowerAppBrowser browser)
+        {
+            var rows = browser.Driver.FindElements(By.XPath("//*[contains(@data-control-part,'gallery-item')]"));
+
+            int cnt = 1;
+
+            foreach (var row in rows)
+            {
+                var rowLabel = row.FindElement(By.XPath(".//div[contains(@data-control-name,'txtlblInline')]")).Text;
+
+                if (!String.IsNullOrEmpty(rowLabel))
+                    row.FindElement(By.XPath(".//div[contains(@data-control-name,'txtValue')]")).FindElement(By.TagName("input")).SendKeys(cnt++.ToString());
+            }
+
+            browser.ThinkTime(100);
         }
     }
 
