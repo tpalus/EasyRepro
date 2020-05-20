@@ -18,7 +18,12 @@ namespace Microsoft.PowerApps.UIAutomation.Api.Controls
                 var appControl = browser.Driver.FindElement(By.XPath($"//div[@data-control-name='{this.ControlName}']"));
 
                 if (appControl.FindElements(By.TagName("input")).Count > 0)
-                    appControl.FindElement(By.TagName("input")).SendKeys(this.ControlValue);
+                {
+                    var textBox = appControl.FindElement(By.TagName("input"));
+
+                    ScrollIntoView(browser, textBox);
+                    textBox.SendKeys(this.ControlValue);
+                }
                 else
                     throw new NotFoundException($"Unable to find { this.ControlName } text box.");
 

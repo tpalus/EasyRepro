@@ -345,7 +345,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
         }
 
         [TestMethod]
-        public void NOTIMPLEMENTED_UseBedCapacityApp()
+        public void UseBedCapacityApp()
         {
             var username = ConfigurationManager.AppSettings["OnlineUsername"];
             var password = ConfigurationManager.AppSettings["OnlinePassword"];
@@ -359,9 +359,45 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
                 //Launch the App
                 appBrowser.OnlineLogin.PowerAppsLogin(appsPage, username.ToSecureString(), null);
 
+                //Pick the DDL Lists
+                COVIDLocation location = SetNewLocation(appBrowser);
 
+                //Click Next Button
+                appBrowser.Player.ClickButton("Next");
+
+                //Select Staffing Needs App
+                appBrowser.Player.ClickGalleryItem(EmergencyResponseAppNames.BedCapacity, true);
+
+                //Fill out the form and click Send
+                SetBedCapacityValues(appBrowser);
+
+                appBrowser.Player.ClickButton("Submit");
+                appBrowser.ThinkTime(2000);
+
+                //Check the Inserted Values
+
+                //Click the Home button
+                appBrowser.Player.ClickButton("Home");
+
+                //Select a different system/location/facility
+                appBrowser.Player.ReturnToFacilityMenu(location.System);
+
+                //Choose New Location
+                COVIDLocation location2 = SetNewLocation(appBrowser);
+
+                //Click Next Button
+                appBrowser.Player.ClickButton("Next");
+
+                //Reopen the App
+                appBrowser.Player.ClickGalleryItem(EmergencyResponseAppNames.BedCapacity, true);
+
+                //Click the feedback Icon
+                ProvideFeedback(appBrowser);
+
+                appBrowser.Player.ClickButton("Submit");
 
                 appBrowser.ThinkTime(1000);
+
             }
 
         }
@@ -416,7 +452,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
         }
 
         [TestMethod]
-        public void NOTIMPLEMENTED_UseEquipmentApp()
+        public void NOTIMPLMENTED_UseEquipmentApp()
         {
             var username = ConfigurationManager.AppSettings["OnlineUsername"];
             var password = ConfigurationManager.AppSettings["OnlinePassword"];
@@ -662,8 +698,26 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.EmergencyResponseApp
             appBrowser.Player.SetValue(textArea);
         }
 
+        private void SetValue_RadioButton(PowerAppBrowser appBrowser, string controlName, string radioValueToClick)
+        {
+            RadioButton radio = new RadioButton() { ControlName = controlName, ControlValue = radioValueToClick };
+            appBrowser.Player.SetValue(radio);
+        }
+        private void SetBedCapacityValues(PowerAppBrowser browser)
+        {
+            int i = 0;
 
-
+            SetStaffingNeedsValue_TextBox(browser, "LicensedBeds", "DataCardValue8_1", i++.ToString());
+            SetStaffingNeedsValue_TextBox(browser, "# of ICU Beds (AIIR)", "DataCardValue9_1", i++.ToString());
+            SetStaffingNeedsValue_TextBox(browser, "# of ICU Beds (non-AIIR)", "DataCardValue10_1", i++.ToString());
+            SetStaffingNeedsValue_TextBox(browser, "# Acute Beds (AIIR)", "DataCardValue11_1", i++.ToString());
+            SetStaffingNeedsValue_TextBox(browser, "# of Acute Beds (non-AIIR)", "DataCardValue1", i++.ToString());
+            SetValue_RadioButton(browser, "Radio4", "Yes");
+            SetValue_RadioButton(browser, "Radio4_1", "Yes");
+            SetStaffingNeedsValue_TextBox(browser, "# of Surge Beds", "DataCardValue16_1", i++.ToString());
+            SetStaffingNeedsValue_TextBox(browser, "# of Pediatric ICU Beds", "DataCardValue13", i++.ToString());
+            SetStaffingNeedsValue_TextBox(browser, "# of Pediatric Acute Beds", "DataCardValue7", i++.ToString());
+        }
     }
 
     public class COVIDLocation

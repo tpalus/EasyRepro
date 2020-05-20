@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.PowerApps.UIAutomation.Api.Controls
 {
-    public class TextArea : PlayerControl
+    public class RadioButton : PlayerControl
     {
         public override void SetValue(InteractiveBrowser browser)
         {
@@ -16,7 +16,15 @@ namespace Microsoft.PowerApps.UIAutomation.Api.Controls
             {
                 //Click the down arrow
                 var appControl = browser.Driver.FindElement(By.XPath($"//div[@data-control-name='{this.ControlName}']"));
-                appControl.FindElement(By.TagName("textarea")).SendKeys(this.ControlValue);
+
+                if (appControl.FindElements(By.TagName("input")).Count > 0)
+                {
+                    var radioButton = appControl.FindElement(By.XPath($".//input[contains(@value,'{ this.ControlValue }')]"));
+                    ScrollIntoView(browser, radioButton);
+                    radioButton.Click(true);
+                }
+                else
+                    throw new NotFoundException($"Unable to find { this.ControlName } text box.");
 
                 browser.ThinkTime(100);
 

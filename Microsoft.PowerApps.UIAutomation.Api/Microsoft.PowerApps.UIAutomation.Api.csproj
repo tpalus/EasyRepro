@@ -52,6 +52,7 @@
     <Compile Include="Controls\CanvasControl.cs" />
     <Compile Include="Controls\ComboBox.cs" />
     <Compile Include="Controls\TextArea.cs" />
+    <Compile Include="Controls\RadioButton.cs" />
     <Compile Include="Controls\TextBox.cs" />
     <Compile Include="Controls\DropDownList.cs" />
     <Compile Include="Controls\PlayerControl.cs" />
