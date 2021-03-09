@@ -486,7 +486,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 var subAreaItems = groupList.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
-                var subAreaItem = subAreaItems.FirstOrDefault(a => a.GetAttribute("data-text").ToLowerString() == subarea.ToLowerString());
+                var subAreaItem = subAreaItems.FirstOrDefault(a => a.GetAttribute("data-text").ToLowerString() == subarea.ToLowerString() && a.GetAttribute("data-id").Contains(group.ToLowerString()));
                 if (subAreaItem == null)
                 {
                     throw new NotFoundException($"No subarea with the name '{subarea}' exists inside of '{group}'");
